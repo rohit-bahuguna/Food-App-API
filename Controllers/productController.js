@@ -43,6 +43,22 @@ const getFood = async (req , res) => {
         res.status(400).json({massage : error.massage})
     }
 }
+
+const getAFood = async (req , res) => {
+    
+    try {
+        const id = req.params.id;
+        // console.log(id)
+        const response = await productModel.findById(id)
+        res.status(200).json(response);
+        
+    } catch (error) {
+        console.log(error);
+        res.status(400).json({massage : error.massage})
+    }
+}
+
+
 const deleteFood = () => {
 
 }
@@ -52,5 +68,5 @@ const updateFood = () => {
 
 
 
-module.exports = {addFood , getFood , deleteFood , updateFood}
+module.exports = {addFood , getFood , deleteFood , updateFood , getAFood}
 
