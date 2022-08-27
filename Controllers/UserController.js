@@ -1,6 +1,7 @@
 const userModel = require('../Model/UserSchema');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt')
+require('dotenv').config()
 
 const LogIn = async (req , res) => {
     
@@ -21,8 +22,11 @@ const LogIn = async (req , res) => {
                 password : hashPassword
             })
 
+            
+
             const response = await newUser.save();
-            res.status(200).json(response);
+            const token = jwt.sign({email:response.email , id: response._id , name :response.name} , process.env.SECRET_KEY)
+            res.status(200).json({ user : response , token : token});
 
         }
 
@@ -33,9 +37,29 @@ const LogIn = async (req , res) => {
     }
 }
 
-const signUp = async (req , res) => {
+const signIn = async (req , res) => {
+
+    try {
+        const { email, password } = req.body;
+        const user = await userModel.findOne({ email: email });
+
+        if (!user) {
+            return res.status(401).json({massage : "user dose not exist please Login"})
+        }
+
+        const result = await bcrypt.compare(password, user.password)
+        if (!result) {
+            return res.status(400).json({massage : " Invalid password "})
+        }
+        const token = jwt.sign({email : user.email , id:user._id , name :user.name} , process.env.SECRET_KEY)
+        res.status(200).json({user : user , token : token})
         
+    } catch (error) {
+        console.log(error);
+        res.status(400).json({massage : error.massage})
+    }
 }
+
 
 const getAllUser = async (req , res) => {
 
@@ -49,4 +73,4 @@ const getAllUser = async (req , res) => {
     }
 }
 
-module.exports = {LogIn , getAllUser , signUp}
+module.exports = {LogIn , getAllUser , signIn}
