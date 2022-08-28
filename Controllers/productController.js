@@ -59,11 +59,31 @@ const getAFood = async (req , res) => {
 }
 
 
-const deleteFood = () => {
-
+const deleteFood = async (req , res) => {
+  try {
+      const id = req.params.id;
+      const response = await  productModel.findByIdAndDelete({ _id: id })
+      res.status(200).json(response)
+      
+  } catch (error) {
+      console.log(error);
+      res.status(400).json({massage : error.massage})
+      
+  }
 }
-const updateFood = () => {
+const updateFood = async (req, res) => {
+    
+    try {
+        const id = req.body._id;
+    
+        const response = await productModel.findByIdAndUpdate({ _id: id }, req.body, { new: true })
+        res.status(200).json(response);
 
+            
+        } catch (error) {
+            console.log(error);
+      res.status(400).json({massage : error.massage})
+        }
 }
 
 
